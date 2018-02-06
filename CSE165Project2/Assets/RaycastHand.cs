@@ -7,16 +7,28 @@ public class RaycastHand : MonoBehaviour {
     public GameObject rightHand;
     public GameObject leftHand;
 
-    private GameObject lastHit = null;
+    public GameObject lastHit = null;
 
     private LineRenderer line;
 
-    private Collider currCollider;
+
+    public bool copyPasteOn = false;
+    public bool newObjectOn = false;
+
+
+    public Material buttonOn;
+    public Material buttonOff;
+
+
+    private GameObject curr;
+
+
 
 
     public Vector3 prevRHpos;
     public Vector3 prevHitPos;
-    public Vector3 lastValidPosition;
+    public Vector3 initialPosition;
+    public Quaternion initialRotation;
 
     public bool collision = false;
 
@@ -58,7 +70,7 @@ public class RaycastHand : MonoBehaviour {
 
 
 
-                        lastValidPosition = prevHitPos;
+                        
 
 
                         float offset = (prevHitPos - prevRHpos).magnitude;
@@ -118,11 +130,37 @@ public class RaycastHand : MonoBehaviour {
 
             if (lastHit != null)
             {
-                    //turn physics on
-                    lastHit.GetComponent<Rigidbody>().useGravity = true;
-                    lastHit.GetComponent<Rigidbody>().isKinematic = false;
-                    lastHit = null;
-                    currCollider.isTrigger = false;
+              
+                //return to initial position
+                if(collision)
+                {
+                    if (copyPasteOn)
+                    {
+
+                        Destroy(lastHit);
+
+                    }
+                    else
+                    {
+
+                        lastHit.transform.position = initialPosition;
+                        lastHit.transform.rotation = initialRotation;
+
+                    }
+                }
+
+                //turn physics on
+                lastHit.GetComponent<Rigidbody>().useGravity = true;
+                //lastHit.GetComponent<Rigidbody>().isKinematic = false;
+                
+                lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
+
+                lastHit.GetComponent<Collider>().isTrigger = false;
+
+                //reset rotation
+                //lastHit.transform.rotation.
+
+                lastHit = null;
 
             }
 
@@ -142,7 +180,7 @@ public class RaycastHand : MonoBehaviour {
     {
 
         RaycastHit hit;
-        GameObject curr;
+        
 
         //hit something
         if (Physics.Raycast(rightHand.transform.position, rightHand.transform.forward, out hit))
@@ -155,14 +193,74 @@ public class RaycastHand : MonoBehaviour {
 
                 lastHit = null;
 
+                
+
+
+
+            }
+            else if (curr.CompareTag("CopyPaste"))
+            {
+                lastHit = null;
+
+                if (copyPasteOn)
+                {
+                    copyPasteOn = false;
+                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+
+                }
+                else
+                {
+
+                    copyPasteOn = true;
+
+                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+                }
+
+            }
+            else if (curr.CompareTag("NewObject"))
+            {
+
+                lastHit = null;
+
+                if (newObjectOn)
+                {
+                    newObjectOn = false;
+                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+
+                }
+                else
+                {
+
+                    newObjectOn = true;
+
+                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+                }
+
             }
             //hit object elligible for transform
             else
             {
+                //duplicate object
+                if (copyPasteOn)
+                {
+                    GameObject newCopy = Instantiate(curr, curr.transform.parent, true);
+                    curr = newCopy;
+
+                    newCopy.GetComponent<Collider>().isTrigger = true;
+                   
+
+                }
+                else
+                {
+
+                    curr.GetComponent<Collider>().isTrigger = true;
+                }
+
+                curr.GetComponent<MeshRenderer>().material = curr.GetComponent<Collision>().activeMaterial; //reset material
 
                 //turn physics off
                 curr.GetComponent<Rigidbody>().useGravity = false;
-                curr.GetComponent<Rigidbody>().isKinematic = true;
+                //curr.GetComponent<Rigidbody>().isKinematic = true;
 
                 //save previous locations
                 prevRHpos = rightHand.transform.position;
@@ -171,8 +269,10 @@ public class RaycastHand : MonoBehaviour {
 
 
                 lastHit = curr;
-                currCollider = lastHit.GetComponent<Collider>();
-                //currCollider.isTrigger = true;
+    
+                
+                initialPosition = curr.transform.position;
+                initialRotation = curr.transform.rotation;
 
 
             }
