@@ -14,6 +14,8 @@ public class RaycastHand : MonoBehaviour {
 
     public bool copyPasteOn = false;
     public bool newObjectOn = false;
+    public bool tapeOn = false;
+    public bool groupOn = false;
 
 
     public Material buttonOn;
@@ -21,6 +23,9 @@ public class RaycastHand : MonoBehaviour {
 
 
     private GameObject curr;
+
+    public GameObject TapeBegin;
+    public GameObject TapeEnd;
 
 
 
@@ -232,6 +237,61 @@ public class RaycastHand : MonoBehaviour {
                 {
 
                     newObjectOn = true;
+
+                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+                }
+
+            }
+            else if (curr.CompareTag("Tape"))
+            {
+
+                lastHit = null;
+
+                if (tapeOn)
+                {
+                    tapeOn = false;
+                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+
+                    TapeBegin.SetActive(false);
+                    TapeEnd.SetActive(false);
+                    
+                }
+                else
+                {
+
+                    tapeOn = true;
+
+                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+
+                    //spawn spheres
+                    TapeBegin.SetActive(true);
+                    TapeEnd.SetActive(true);
+
+                    Vector3 offset = new Vector3( 0, 0.1f, 0 );
+
+                    TapeBegin.transform.position = rightHand.transform.position + offset;
+
+                    TapeEnd.transform.position = rightHand.transform.position - offset;
+
+
+                }
+
+            }
+            else if (curr.CompareTag("Group"))
+            {
+
+                lastHit = null;
+
+                if (groupOn)
+                {
+                    groupOn = false;
+                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+
+                }
+                else
+                {
+
+                    groupOn = true;
 
                     curr.GetComponent<MeshRenderer>().material = buttonOn;
                 }
