@@ -154,9 +154,14 @@ public class RaycastHand : MonoBehaviour {
                     }
                 }
 
-                //turn physics on
-                lastHit.GetComponent<Rigidbody>().useGravity = true;
-                //lastHit.GetComponent<Rigidbody>().isKinematic = false;
+                if (!(curr.CompareTag("TapePoint")))
+                {
+
+                    //turn physics on
+                    lastHit.GetComponent<Rigidbody>().useGravity = true;
+                    //lastHit.GetComponent<Rigidbody>().isKinematic = false;
+
+                }
                 
                 lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
 
@@ -210,7 +215,7 @@ public class RaycastHand : MonoBehaviour {
                 if (copyPasteOn)
                 {
                     copyPasteOn = false;
-                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOff;
 
                 }
                 else
@@ -218,7 +223,7 @@ public class RaycastHand : MonoBehaviour {
 
                     copyPasteOn = true;
 
-                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOn;
                 }
 
             }
@@ -230,7 +235,7 @@ public class RaycastHand : MonoBehaviour {
                 if (newObjectOn)
                 {
                     newObjectOn = false;
-                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOff;
 
                 }
                 else
@@ -238,7 +243,7 @@ public class RaycastHand : MonoBehaviour {
 
                     newObjectOn = true;
 
-                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOn;
                 }
 
             }
@@ -250,7 +255,8 @@ public class RaycastHand : MonoBehaviour {
                 if (tapeOn)
                 {
                     tapeOn = false;
-                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOff;
+                    //curr.GetComponentInChildren<MeshRenderer>().material = buttonOff;
 
                     TapeBegin.SetActive(false);
                     TapeEnd.SetActive(false);
@@ -261,7 +267,7 @@ public class RaycastHand : MonoBehaviour {
 
                     tapeOn = true;
 
-                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOn;
 
                     //spawn spheres
                     TapeBegin.SetActive(true);
@@ -285,7 +291,7 @@ public class RaycastHand : MonoBehaviour {
                 if (groupOn)
                 {
                     groupOn = false;
-                    curr.GetComponent<MeshRenderer>().material = buttonOff;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOff;
 
                 }
                 else
@@ -293,8 +299,13 @@ public class RaycastHand : MonoBehaviour {
 
                     groupOn = true;
 
-                    curr.GetComponent<MeshRenderer>().material = buttonOn;
+                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOn;
                 }
+
+            }
+            else if (curr.CompareTag("UnTouchable"))
+            {
+                lastHit = null;
 
             }
             //hit object elligible for transform
@@ -303,23 +314,43 @@ public class RaycastHand : MonoBehaviour {
                 //duplicate object
                 if (copyPasteOn)
                 {
-                    GameObject newCopy = Instantiate(curr, curr.transform.parent, true);
-                    curr = newCopy;
 
-                    newCopy.GetComponent<Collider>().isTrigger = true;
+                    if (!(curr.CompareTag("TapePoint")))
+                    {
+
+                        GameObject newCopy = Instantiate(curr, curr.transform.parent, true);
+                        curr = newCopy;
+
+                        newCopy.GetComponent<Collider>().isTrigger = true;
+
+                    }
                    
 
                 }
                 else
                 {
 
-                    curr.GetComponent<Collider>().isTrigger = true;
+
+                    if (!(curr.CompareTag("TapePoint")))
+                    {
+
+                        curr.GetComponent<Collider>().isTrigger = true;
+
+                    }
                 }
 
                 curr.GetComponent<MeshRenderer>().material = curr.GetComponent<Collision>().activeMaterial; //reset material
 
-                //turn physics off
-                curr.GetComponent<Rigidbody>().useGravity = false;
+
+                if (!(curr.CompareTag("TapePoint")))
+                {
+
+                    //turn physics off
+                    curr.GetComponent<Rigidbody>().useGravity = false;
+
+                }
+
+                
                 //curr.GetComponent<Rigidbody>().isKinematic = true;
 
                 //save previous locations

@@ -9,6 +9,8 @@ TagManager:
   - NewObject
   - Group
   - Tape
+  - TapePoint
+  - UnTouchable
   layers:
   - Default
   - TransparentFX

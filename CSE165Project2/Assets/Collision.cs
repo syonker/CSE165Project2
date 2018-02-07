@@ -20,13 +20,26 @@ public class Collision : MonoBehaviour {
 
             //other.gameObject.transform.position = empty.GetComponent<RaycastHand>().lastValidPosition;
 
+            //empty.GetComponent<RaycastHand>().collision = true;
+
+            //change material to red
+            //this.GetComponent<MeshRenderer>().material = collisionMaterial;
+
+        }
+
+    }
+
+    void OnTriggerStay(Collider trigger)
+    {
+        if (empty.GetComponent<RaycastHand>().lastHit == this.gameObject)
+        {
+
             empty.GetComponent<RaycastHand>().collision = true;
 
             //change material to red
             this.GetComponent<MeshRenderer>().material = collisionMaterial;
 
         }
-
     }
 
     //not colliding 
