@@ -82,13 +82,24 @@ public class RaycastHand : MonoBehaviour {
 
                         lastHit.transform.position = rightHand.transform.position + rightHand.transform.forward * offset;
 
-                        lastHit.transform.rotation = rightHand.transform.rotation;
+                        //lastHit.transform.rotation = rightHand.transform.rotation;
 
 
-                        //movement forward/backward
+                        //movement forward/backward and rotation
                         Vector2 rightStick = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
 
-                        lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 100);
+                        float vertical = rightStick.y;
+                        float horizontal = rightStick.x;
+
+                        if(Mathf.Abs(vertical) > Mathf.Abs(horizontal))
+                        {
+                            lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 100);
+                        }
+                        else
+                        {
+                            lastHit.transform.Rotate(0, (rightStick.x), 0);
+                        }
+
 
 
 

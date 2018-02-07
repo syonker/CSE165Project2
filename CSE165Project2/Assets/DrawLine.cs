@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DrawLine : MonoBehaviour {
 
@@ -27,6 +28,13 @@ public class DrawLine : MonoBehaviour {
 
             line.SetPosition(0, transform.position);
             line.SetPosition(1, endPoint.transform.position);
+
+
+            float dist = (transform.position - endPoint.transform.position).magnitude;
+
+
+
+            transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = dist.ToString();
 
 
         }
