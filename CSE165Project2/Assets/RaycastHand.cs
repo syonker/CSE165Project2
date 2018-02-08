@@ -17,6 +17,8 @@ public class RaycastHand : MonoBehaviour {
     public bool tapeOn = false;
     public bool groupOn = false;
 
+    private bool ReadyToTeleport = true;
+
 
     public Material buttonOn;
     public Material buttonOff;
@@ -44,111 +46,127 @@ public class RaycastHand : MonoBehaviour {
     void Start () {
 
         line = GetComponent<LineRenderer>();
+        line.material.color = Color.red;
         line.enabled = false;
     }
 	
 	// Update is called once per frame
 	void Update () {
 
-        
 
-        //if right hand trigger is pressed
-        if (OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger))
+        //if left hand trigger is pressed
+        if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger)  && !(OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger)))
         {
 
-            //if there is no collision occuring
-            //if (!collision)
-            //{
+            //show blue line
+            line.enabled = true;
+            line.material.color = Color.blue;
+            line.SetPosition(0, rightHand.transform.position);
+            line.SetPosition(1, rightHand.transform.position + rightHand.transform.forward * 100);
+
+
+        }
+        //if left hand trigger is pressed and right hand trigger is pressed
+        else if (OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger) && OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
+        {
+
+            if (ReadyToTeleport)
+            {
+                //teleport
+                Debug.Log("Teleport!");
+                ReadyToTeleport = false;
+            }
 
 
 
-                line.enabled = true;
-                line.SetPosition(0, rightHand.transform.position);
-                line.SetPosition(1, rightHand.transform.position + rightHand.transform.forward * 100);
 
-                //held down
-                if (SecIndOn)
+
+
+        }
+        //if just right hand trigger is pressed
+        else if (OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger))
+        {
+
+
+            line.enabled = true;
+            line.material.color = Color.red;
+            line.SetPosition(0, rightHand.transform.position);
+            line.SetPosition(1, rightHand.transform.position + rightHand.transform.forward * 100);
+
+            //held down
+            if (SecIndOn)
+            {
+
+                if (lastHit != null)
                 {
 
-                    if (lastHit != null)
+
+                    float offset = (prevHitPos - prevRHpos).magnitude;
+
+                    lastHit.transform.position = rightHand.transform.position + rightHand.transform.forward * offset;
+
+                    //lastHit.transform.rotation = rightHand.transform.rotation;
+
+
+                    //movement forward/backward and rotation
+                    Vector2 rightStick = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+
+                    float vertical = rightStick.y;
+                    float horizontal = rightStick.x;
+
+                    if (Mathf.Abs(vertical) > Mathf.Abs(horizontal))
                     {
-
-
-
-                        
-
-
-                        float offset = (prevHitPos - prevRHpos).magnitude;
-
-                        lastHit.transform.position = rightHand.transform.position + rightHand.transform.forward * offset;
-
-                        //lastHit.transform.rotation = rightHand.transform.rotation;
-
-
-                        //movement forward/backward and rotation
-                        Vector2 rightStick = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
-
-                        float vertical = rightStick.y;
-                        float horizontal = rightStick.x;
-
-                        if(Mathf.Abs(vertical) > Mathf.Abs(horizontal))
-                        {
-                            lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 100);
-                        }
-                        else
-                        {
-                            lastHit.transform.Rotate(0, (rightStick.x), 0);
-                        }
-
-
-
-
-                        prevHitPos = lastHit.transform.position;
-                        prevRHpos = rightHand.transform.position;
-
-
-
-
-
-                        line.SetPosition(1, lastHit.transform.position);
-
-
-
-
-
+                        lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 100);
+                    }
+                    else
+                    {
+                        lastHit.transform.Rotate(0, (rightStick.x), 0);
                     }
 
 
 
 
+                    prevHitPos = lastHit.transform.position;
+                    prevRHpos = rightHand.transform.position;
+
+
+
+
+
+                    line.SetPosition(1, lastHit.transform.position);
+
+
+
+
+
                 }
-                //first click
-                else
-                {
-                    SecIndOn = true;
-
-                    RaycastRightHand();
-
-                }
 
 
 
 
-            //}
+            }
+            //first click
+            else
+            {
+                SecIndOn = true;
+
+                RaycastRightHand();
+
+            }
 
         }
-        //if right hand trigger is not pressed
+        //if no trigger is not pressed
         else
         {
-
+            ReadyToTeleport = true;
             SecIndOn = false;
             line.enabled = false;
 
             if (lastHit != null)
             {
-              
+
                 //return to initial position
-                if(collision)
+                if (collision)
                 {
                     if (copyPasteOn)
                     {
@@ -173,7 +191,7 @@ public class RaycastHand : MonoBehaviour {
                     lastHit.GetComponent<Rigidbody>().isKinematic = false;
 
                 }
-                
+
                 lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
 
                 lastHit.GetComponent<Collider>().isTrigger = false;
