@@ -25,6 +25,7 @@ public class Collision : MonoBehaviour {
             //change material to red
             //this.GetComponent<MeshRenderer>().material = collisionMaterial;
 
+
         }
 
     }
@@ -55,6 +56,13 @@ public class Collision : MonoBehaviour {
 
             //change to green
             this.GetComponent<MeshRenderer>().material = activeMaterial;
+
+
+
+
+
         }
+
+
     }
 }

@@ -170,7 +170,7 @@ public class RaycastHand : MonoBehaviour {
 
                     //turn physics on
                     lastHit.GetComponent<Rigidbody>().useGravity = true;
-                    //lastHit.GetComponent<Rigidbody>().isKinematic = false;
+                    lastHit.GetComponent<Rigidbody>().isKinematic = false;
 
                 }
                 
@@ -180,6 +180,8 @@ public class RaycastHand : MonoBehaviour {
 
                 //reset rotation
                 //lastHit.transform.rotation.
+
+                //lastHit.GetComponent<Rigidbody>().isKinematic = false;
 
                 lastHit = null;
 
@@ -358,11 +360,12 @@ public class RaycastHand : MonoBehaviour {
 
                     //turn physics off
                     curr.GetComponent<Rigidbody>().useGravity = false;
+                    curr.GetComponent<Rigidbody>().isKinematic = true;
 
                 }
 
                 
-                //curr.GetComponent<Rigidbody>().isKinematic = true;
+               //curr.GetComponent<Rigidbody>().isKinematic = true;
 
                 //save previous locations
                 prevRHpos = rightHand.transform.position;
