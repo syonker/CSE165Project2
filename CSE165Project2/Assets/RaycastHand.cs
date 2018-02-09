@@ -128,9 +128,22 @@ public class RaycastHand : MonoBehaviour
                 {
                     //rotates individually
                     //lastHit.transform.Rotate(0, (rightStick.x), 0);
+
+
+                    //calculate center position and rotate around it
+
+                    Vector3 center = new Vector3(0, 0, 0);
+
                     for (int i = 0; i < lastHit.transform.childCount; i++)
                     {
-                        lastHit.transform.GetChild(i).transform.Rotate(0, (rightStick.x), 0);
+                        center += lastHit.transform.GetChild(i).transform.position;
+                    }
+                    center = center / (lastHit.transform.childCount);
+
+
+                    for (int i = 0; i < lastHit.transform.childCount; i++)
+                    {
+                        lastHit.transform.GetChild(i).transform.RotateAround(center, new Vector3(0, 1, 0), rightStick.x);
                     }
                 }
 
@@ -189,13 +202,24 @@ public class RaycastHand : MonoBehaviour
             }
 
             
-            //return to initial position
+            //let go in collision
             if (collision)
             {
-
-                for (int i = 0; i < lastHit.transform.childCount; i++)
+                //destroy all children
+                if (copyPasteOn)
                 {
-                    lastHit.transform.GetChild(i).transform.position = initialPositions[i];
+
+                    Destroy(lastHit);
+
+                }
+                //reset positions
+                else
+                {
+
+                    for (int i = 0; i < lastHit.transform.childCount; i++)
+                    {
+                        lastHit.transform.GetChild(i).transform.position = initialPositions[i];
+                    }
                 }
                 
             }
@@ -404,7 +428,7 @@ public class RaycastHand : MonoBehaviour
                     }
                     else
                     {
-                        lastHit.transform.Rotate(0, (rightStick.x), 0);
+                        lastHit.transform.Rotate(0, 0, (rightStick.x));
                     }
 
 
@@ -728,6 +752,37 @@ public class RaycastHand : MonoBehaviour
                 {
 
                     groupSelected = true;
+
+
+                    //duplicate group
+                    if (copyPasteOn)
+                    {
+
+                        newGroup = Instantiate(Group, Group.transform.parent, true);
+
+                        int size = curr.transform.parent.childCount;
+
+                        GameObject oldCurr = curr;
+
+                        for (int i = 0; i < size; i++)
+                        {
+
+                            GameObject newObject = Instantiate(oldCurr.transform.parent.GetChild(i).gameObject, newGroup.transform, true);
+
+                            newObject.GetComponent<Collider>().isTrigger = true;
+
+
+                            if (oldCurr.transform.parent.GetChild(i).gameObject == oldCurr)
+                            {
+                                curr = newObject;
+
+                            }
+
+                        }
+
+                    }
+
+
 
                     selectedChild = curr;
 
