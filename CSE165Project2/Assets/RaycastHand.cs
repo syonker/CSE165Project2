@@ -410,7 +410,8 @@ public class RaycastHand : MonoBehaviour
                         Destroy(lastHit);
 
 
-                        GameObject newObj = Instantiate(NewArray.transform.GetChild(indexNew).gameObject, transform.parent, true);
+                        //GameObject newObj = Instantiate(NewArray.transform.GetChild(indexNew).gameObject, transform.parent, true);
+                        GameObject newObj = Instantiate(NewArray.transform.GetChild(indexNew).gameObject, Furniture.transform, true);
 
                         lastHit = newObj;
 
