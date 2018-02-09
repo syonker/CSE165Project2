@@ -11,6 +11,15 @@ TagManager:
   - Tape
   - TapePoint
   - UnTouchable
+  - Cube
+  - Room
+  - Empty
+  - Locker
+  - Whiteboard
+  - Desk
+  - Cabinet
+  - 3DTV
+  - Chair
   layers:
   - Default
   - TransparentFX
