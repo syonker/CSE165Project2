@@ -8,10 +8,17 @@ public class RaycastHand : MonoBehaviour
     public GameObject rightHand;
     public GameObject leftHand;
 
+    private bool aPressed = false;
+
+    private int indexNew = 0;
+
     public GameObject ground;
     public GameObject cam;
 
     public GameObject lastHit = null;
+
+
+    public GameObject NewArray;
 
     private LineRenderer line;
 
@@ -58,6 +65,42 @@ public class RaycastHand : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        //create object
+        if (newObjectOn && (lastHit == null))
+        {
+
+            GameObject newObj = Instantiate(NewArray.transform.GetChild(indexNew).gameObject, transform.parent, true);
+
+            lastHit = newObj;
+
+            newObj.SetActive(true);
+
+            lastHit.GetComponent<Collider>().isTrigger = true;
+
+
+            lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+            line.material.color = Color.green;
+
+
+            //turn physics off
+            lastHit.GetComponent<Rigidbody>().useGravity = false;
+            lastHit.GetComponent<Rigidbody>().isKinematic = true;
+
+
+            //save previous locations
+            prevRHpos = rightHand.transform.position;
+
+            prevHitPos = lastHit.transform.position;
+
+
+            initialPosition = lastHit.transform.position;
+            initialRotation = lastHit.transform.rotation;
+
+            return;
+
+
+        }
 
 
 
@@ -130,6 +173,45 @@ public class RaycastHand : MonoBehaviour
                 {
 
 
+
+                    if (newObjectOn && OVRInput.GetUp(OVRInput.Button.One))
+                    {
+
+                         //change object
+                        if (indexNew < 4)
+                        {
+                            indexNew++;
+                        } else
+                        {
+                            indexNew = 0;
+                        }
+
+                        Destroy(lastHit);
+
+
+                        GameObject newObj = Instantiate(NewArray.transform.GetChild(indexNew).gameObject, transform.parent, true);
+
+                        lastHit = newObj;
+
+                        newObj.SetActive(true);
+
+                        lastHit.GetComponent<Collider>().isTrigger = true;
+
+
+                        lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+                        line.material.color = Color.green;
+
+
+                        //turn physics off
+                        lastHit.GetComponent<Rigidbody>().useGravity = false;
+                        lastHit.GetComponent<Rigidbody>().isKinematic = true;
+
+                        return;
+
+                    }
+
+
+
                     float offset = (prevHitPos - prevRHpos).magnitude;
 
                     lastHit.transform.position = rightHand.transform.position + rightHand.transform.forward * offset;
@@ -184,20 +266,59 @@ public class RaycastHand : MonoBehaviour
             }
 
         }
-        //if no trigger is not pressed
+        //if no trigger is pressed
         else
         {
             ReadyToTeleport = true;
             SecIndOn = false;
             line.enabled = false;
 
+
+
+
             if (lastHit != null)
             {
+
+                
+                //was curr
+                if (lastHit.CompareTag("TapePoint"))
+                {
+
+
+                    lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+
+                    line.material.color = Color.white;
+
+                    lastHit = null;
+
+                    return;
+
+
+                }
+
+                //turn physics on
+                lastHit.GetComponent<Rigidbody>().useGravity = true;
+                lastHit.GetComponent<Rigidbody>().isKinematic = false;
+
+                //lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
+                lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+
+                line.material.color = Color.white;
+
+
+
+                lastHit.GetComponent<Collider>().isTrigger = false;
+
+                //reset rotation
+                //lastHit.transform.rotation.
+
+                //lastHit.GetComponent<Rigidbody>().isKinematic = false;
+
 
                 //return to initial position
                 if (collision)
                 {
-                    if (copyPasteOn)
+                    if (copyPasteOn || newObjectOn)
                     {
 
                         Destroy(lastHit);
@@ -209,29 +330,17 @@ public class RaycastHand : MonoBehaviour
                         lastHit.transform.position = initialPosition;
                         lastHit.transform.rotation = initialRotation;
 
+
                     }
                 }
 
-                if (!(curr.CompareTag("TapePoint")))
-                {
 
-                    //turn physics on
-                    lastHit.GetComponent<Rigidbody>().useGravity = true;
-                    lastHit.GetComponent<Rigidbody>().isKinematic = false;
+                if (newObjectOn)
+                {
+                    newObjectOn = false;
 
                 }
 
-                //lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
-                curr.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
-
-                line.material.color = Color.white;
-
-                lastHit.GetComponent<Collider>().isTrigger = false;
-
-                //reset rotation
-                //lastHit.transform.rotation.
-
-                //lastHit.GetComponent<Rigidbody>().isKinematic = false;
 
                 lastHit = null;
 
@@ -298,7 +407,7 @@ public class RaycastHand : MonoBehaviour
                 if (newObjectOn)
                 {
                     newObjectOn = false;
-                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOff;
+                    //curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOff;
 
                 }
                 else
@@ -306,7 +415,11 @@ public class RaycastHand : MonoBehaviour
 
                     newObjectOn = true;
 
-                    curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOn;
+                    //curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOn;
+
+
+                    lastHit = null;
+
                 }
 
             }

@@ -30,11 +30,13 @@ public class DrawLine : MonoBehaviour {
             line.SetPosition(1, endPoint.transform.position);
 
 
-            float dist = (transform.position - endPoint.transform.position).magnitude;
+            float dist = 60*((transform.position - endPoint.transform.position).magnitude);
+
+            int distt = (int)dist;
 
 
 
-            transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = dist.ToString();
+            transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = distt.ToString() + " in";
 
 
         }
