@@ -510,7 +510,16 @@ public class RaycastHand : MonoBehaviour
 
                 //turn physics on
                 lastHit.GetComponent<Rigidbody>().useGravity = true;
+
+
+
+
+                
                 lastHit.GetComponent<Rigidbody>().isKinematic = false;
+                //lastHit.GetComponent<Rigidbody>().isKinematic = true;
+
+
+
 
                 //lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
                 lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Standard");

@@ -32,6 +32,12 @@ public class Collision : MonoBehaviour
             {
 
 
+                Vector3 offset = new Vector3(0, 0.1f, 0);
+
+                this.transform.position = this.transform.position + offset;
+
+
+
             }
             //if we landed on another object
             //reset position to last valid position
@@ -40,6 +46,9 @@ public class Collision : MonoBehaviour
                 this.transform.position = empty.GetComponent<RaycastHand>().initialPosition;
 
             }
+
+
+            //this.GetComponent<Rigidbody>().isKinematic = false;
 
         }
 
