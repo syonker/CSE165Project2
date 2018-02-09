@@ -10,8 +10,9 @@ public class RaycastHand : MonoBehaviour
 
     public GameObject Furniture;
 
-    private Vector3[] initialPositions;
+    public Vector3[] initialPositions;
 
+    public Vector3[] initialPositions2;
 
 
     public bool falling = false;
@@ -69,6 +70,12 @@ public class RaycastHand : MonoBehaviour
     public Vector3 prevRHpos;
     public Vector3 prevHitPos;
     public Vector3 initialPosition;
+    public Vector3 initialPosition2;
+
+
+
+
+
     public Quaternion initialRotation;
 
     public bool collision = false;
@@ -129,7 +136,7 @@ public class RaycastHand : MonoBehaviour
                     //lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 100);
                     for (int i = 0; i < lastHit.transform.childCount; i++)
                     {
-                        lastHit.transform.GetChild(i).transform.position = lastHit.transform.GetChild(i).transform.position + rightHand.transform.forward * (rightStick.y / 100);
+                        lastHit.transform.GetChild(i).transform.position = lastHit.transform.GetChild(i).transform.position + rightHand.transform.forward * (rightStick.y / 50);
                     }
                 }
                 else
@@ -230,8 +237,25 @@ public class RaycastHand : MonoBehaviour
                     }
                 }
                 
+            } else
+            {
+
+                children = lastHit.GetComponentsInChildren<Collider>();
+                foreach (Collider comp in children)
+                {
+                    comp.isTrigger = true;
+                }
+
+                falling = true;
+
+                initialPositions2 = initialPositions;
+
+
             }
+
+
             
+
 
 
             lastHit = null;
@@ -432,7 +456,7 @@ public class RaycastHand : MonoBehaviour
 
                     if (Mathf.Abs(vertical) > Mathf.Abs(horizontal))
                     {
-                        lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 100);
+                        lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 50);
                     }
                     else
                     {
@@ -572,6 +596,7 @@ public class RaycastHand : MonoBehaviour
 
                     lastHit.GetComponent<Collider>().isTrigger = true;
                     falling = true;
+                    initialPosition2 = initialPosition;
 
                 }
 
@@ -790,6 +815,8 @@ public class RaycastHand : MonoBehaviour
 
                         newGroup = Instantiate(Group, Group.transform.parent, true);
 
+
+
                         int size = curr.transform.parent.childCount;
 
                         GameObject oldCurr = curr;
@@ -824,8 +851,18 @@ public class RaycastHand : MonoBehaviour
                     for (int i = 0; i < curr.transform.parent.childCount; i++)
                     {
 
-                        initialPositions[i] = curr.transform.parent.GetChild(i).transform.position;
+                        if (!copyPasteOn)
+                        {
 
+                            initialPositions[i] = curr.transform.parent.GetChild(i).transform.position;
+                        } else
+                        {
+
+                            initialPositions[i].x = -1000;
+                            initialPositions[i].y = -1000;
+                            initialPositions[i].z = -1000;
+
+                        }
                     }
 
                     initialPosition = curr.transform.position;
@@ -890,6 +927,10 @@ public class RaycastHand : MonoBehaviour
 
                         newCopy.GetComponent<Collider>().isTrigger = true;
 
+                        initialPosition.x = -1000;
+                        initialPosition.y = -1000;
+                        initialPosition.z = -1000;
+
                     }
 
 
@@ -941,9 +982,13 @@ public class RaycastHand : MonoBehaviour
 
                 lastHit = curr;
 
+                if (!copyPasteOn)
+                {
 
-                initialPosition = curr.transform.position;
-                initialRotation = curr.transform.rotation;
+                    initialPosition = curr.transform.position;
+                    initialRotation = curr.transform.rotation;
+
+                }
 
 
             }

@@ -20,35 +20,118 @@ public class Collision : MonoBehaviour
         if (empty.GetComponent<RaycastHand>().falling)
         {
 
-
-            //turn trigger off and falling off
-
-            this.GetComponent<Collider>().isTrigger = false;
-            empty.GetComponent<RaycastHand>().falling = false;
-
-
-            //if we hit floor do nothing
-            if (trigger.gameObject.CompareTag("Floor"))
+            //if its a group
+            if (this.transform.parent.gameObject.CompareTag("Group"))
             {
 
+                Component[] children;
 
-                Vector3 offset = new Vector3(0, 0.1f, 0);
+                children = this.transform.parent.GetComponentsInChildren<Collider>();
+                foreach (Collider comp in children)
+                {
+                    comp.isTrigger = false;
+                }
 
-                this.transform.position = this.transform.position + offset;
+
+                empty.GetComponent<RaycastHand>().falling = false;
+
+
+
+                //if we hit floor do nothing
+                if (trigger.gameObject.CompareTag("Floor"))
+                {
+
+
+                    Vector3 offset = new Vector3(0, 0.1f, 0);
+
+                    //this.transform.position = this.transform.position + offset;
+
+                    for (int i=0; i< transform.parent.childCount; i ++)
+                    {
+
+                        transform.parent.GetChild(i).transform.position += offset; 
+
+                    }
+
+
+
+                }
+                //if we landed on another object
+                //reset position to last valid position
+                else
+                {
+
+                    //if (empty.GetComponent<RaycastHand>().initialPositions2[0].y == -1000)
+                    //{
+
+                        //Destroy(transform.parent);
+
+
+
+                    //}
+                    //else
+                    //{
+
+
+                        for (int i = 0; i < transform.parent.childCount; i++)
+                        {
+
+                            transform.parent.GetChild(i).transform.position = empty.GetComponent<RaycastHand>().initialPositions2[i];
+
+                        }
+
+                    //}
+
+                }
 
 
 
             }
-            //if we landed on another object
-            //reset position to last valid position
             else
             {
-                this.transform.position = empty.GetComponent<RaycastHand>().initialPosition;
+
+                //turn trigger off and falling off
+
+                this.GetComponent<Collider>().isTrigger = false;
+                empty.GetComponent<RaycastHand>().falling = false;
+
+
+                //if we hit floor do nothing
+                if (trigger.gameObject.CompareTag("Floor"))
+                {
+
+
+                    Vector3 offset = new Vector3(0, 0.1f, 0);
+
+                    this.transform.position = this.transform.position + offset;
+
+
+
+                }
+                //if we landed on another object
+                //reset position to last valid position
+                else
+                {
+
+                    //if (empty.GetComponent<RaycastHand>().initialPosition2.y == -1000)
+                    //{
+
+                        //Destroy(this);
+
+                    //}
+
+                    //else { 
+
+                        this.transform.position = empty.GetComponent<RaycastHand>().initialPosition2;
+
+                    //}
+
+                }
+
+
+                //this.GetComponent<Rigidbody>().isKinematic = false;
 
             }
-
-
-            //this.GetComponent<Rigidbody>().isKinematic = false;
 
         }
 
