@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RaycastHand : MonoBehaviour {
+public class RaycastHand : MonoBehaviour
+{
 
     public GameObject rightHand;
     public GameObject leftHand;
+
+    public GameObject ground;
+    public GameObject cam;
 
     public GameObject lastHit = null;
 
@@ -43,19 +47,27 @@ public class RaycastHand : MonoBehaviour {
 
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
 
         line = GetComponent<LineRenderer>();
-        line.material.color = Color.red;
+        line.material.color = Color.white;
         line.enabled = false;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
+
+
+
+        //rotate camera
+        //Vector2 leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+        //cam.transform.Rotate(0,(leftStick.x / 100),0);
 
 
         //if left hand trigger is pressed
-        if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger)  && !(OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger)))
+        if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger) && !(OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger)))
         {
 
             //show blue line
@@ -72,9 +84,26 @@ public class RaycastHand : MonoBehaviour {
 
             if (ReadyToTeleport)
             {
-                //teleport
-                Debug.Log("Teleport!");
-                ReadyToTeleport = false;
+
+                RaycastHit hit;
+
+                Physics.Raycast(rightHand.transform.position, rightHand.transform.forward, out hit);
+
+                if (hit.collider.gameObject.CompareTag("Floor"))
+                {
+
+                    //teleport
+                    Debug.Log("Teleport!");
+
+                    float offset = cam.transform.position.y - ground.transform.position.y;
+                    Vector3 newPos = new Vector3(hit.point.x, hit.point.y + offset, hit.point.z);
+                    cam.transform.position = newPos;
+
+                    ReadyToTeleport = false;
+                    line.material.color = Color.white;
+
+
+                }
             }
 
 
@@ -89,7 +118,7 @@ public class RaycastHand : MonoBehaviour {
 
 
             line.enabled = true;
-            line.material.color = Color.red;
+            //line.material.color = Color.white;
             line.SetPosition(0, rightHand.transform.position);
             line.SetPosition(1, rightHand.transform.position + rightHand.transform.forward * 100);
 
@@ -192,7 +221,10 @@ public class RaycastHand : MonoBehaviour {
 
                 }
 
-                lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
+                //lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
+                curr.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+
+                line.material.color = Color.white;
 
                 lastHit.GetComponent<Collider>().isTrigger = false;
 
@@ -211,17 +243,17 @@ public class RaycastHand : MonoBehaviour {
 
 
 
-        
 
-		
-	}
+
+
+    }
 
     //when trigger is first pressed
     private void RaycastRightHand()
     {
 
         RaycastHit hit;
-        
+
 
         //hit something
         if (Physics.Raycast(rightHand.transform.position, rightHand.transform.forward, out hit))
@@ -234,7 +266,7 @@ public class RaycastHand : MonoBehaviour {
 
                 lastHit = null;
 
-                
+
 
 
 
@@ -291,7 +323,7 @@ public class RaycastHand : MonoBehaviour {
 
                     TapeBegin.SetActive(false);
                     TapeEnd.SetActive(false);
-                    
+
                 }
                 else
                 {
@@ -304,7 +336,7 @@ public class RaycastHand : MonoBehaviour {
                     TapeBegin.SetActive(true);
                     TapeEnd.SetActive(true);
 
-                    Vector3 offset = new Vector3( 0, 0.1f, 0 );
+                    Vector3 offset = new Vector3(0, 0.1f, 0);
 
                     TapeBegin.transform.position = rightHand.transform.position + offset;
 
@@ -339,9 +371,17 @@ public class RaycastHand : MonoBehaviour {
                 lastHit = null;
 
             }
+            else if (curr.CompareTag("Room"))
+            {
+                lastHit = null;
+
+            }
             //hit object elligible for transform
             else
             {
+
+
+
                 //duplicate object
                 if (copyPasteOn)
                 {
@@ -355,7 +395,7 @@ public class RaycastHand : MonoBehaviour {
                         newCopy.GetComponent<Collider>().isTrigger = true;
 
                     }
-                   
+
 
                 }
                 else
@@ -370,7 +410,9 @@ public class RaycastHand : MonoBehaviour {
                     }
                 }
 
-                curr.GetComponent<MeshRenderer>().material = curr.GetComponent<Collision>().activeMaterial; //reset material
+                //curr.GetComponent<MeshRenderer>().material = curr.GetComponent<Collision>().activeMaterial; //reset material
+                curr.GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+                line.material.color = Color.green;
 
 
                 if (!(curr.CompareTag("TapePoint")))
@@ -382,8 +424,8 @@ public class RaycastHand : MonoBehaviour {
 
                 }
 
-                
-               //curr.GetComponent<Rigidbody>().isKinematic = true;
+
+                //curr.GetComponent<Rigidbody>().isKinematic = true;
 
                 //save previous locations
                 prevRHpos = rightHand.transform.position;
@@ -392,8 +434,8 @@ public class RaycastHand : MonoBehaviour {
 
 
                 lastHit = curr;
-    
-                
+
+
                 initialPosition = curr.transform.position;
                 initialRotation = curr.transform.rotation;
 
@@ -406,6 +448,7 @@ public class RaycastHand : MonoBehaviour {
         else
         {
             lastHit = null;
+            line.material.color = Color.white;
 
         }
 
@@ -415,7 +458,7 @@ public class RaycastHand : MonoBehaviour {
 
 
 
-    
+
 
 
 }
