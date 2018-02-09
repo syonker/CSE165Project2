@@ -8,7 +8,16 @@ public class RaycastHand : MonoBehaviour
     public GameObject rightHand;
     public GameObject leftHand;
 
+    public GameObject Group;
+    private GameObject newGroup;
+
+    private GameObject selectedChild;
+
+    private Component[] children;
+
     private bool aPressed = false;
+
+    private bool groupSelected;
 
     private int indexNew = 0;
 
@@ -62,9 +71,160 @@ public class RaycastHand : MonoBehaviour
         line.enabled = false;
     }
 
+
+
+
+    void GroupUpdate()
+    {
+
+        //if just right hand trigger is pressed
+        if (OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger))
+        {
+
+
+            line.enabled = true;
+            //line.material.color = Color.white;
+            line.SetPosition(0, rightHand.transform.position);
+            line.SetPosition(1, rightHand.transform.position + rightHand.transform.forward * 100);
+
+            //held down
+            if (SecIndOn)
+            {
+
+                float offset = (prevHitPos - prevRHpos).magnitude;
+
+                //Vector3 dist = selectedChild.transform.position - prevHitPos;//rightHand.transform.position + rightHand.transform.forward * offset;
+
+                Vector3 dist = (rightHand.transform.position + rightHand.transform.forward * offset) - prevHitPos;
+
+                for (int i = 0; i < lastHit.transform.childCount; i++)
+                {
+                    lastHit.transform.GetChild(i).transform.position = lastHit.transform.GetChild(i).transform.position + dist;
+                }
+
+                //movement forward/backward and rotation
+                Vector2 rightStick = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+
+                float vertical = rightStick.y;
+                float horizontal = rightStick.x;
+
+                if (Mathf.Abs(vertical) > Mathf.Abs(horizontal))
+                {
+                    //lastHit.transform.position = lastHit.transform.position + rightHand.transform.forward * (rightStick.y / 100);
+                    for (int i = 0; i < lastHit.transform.childCount; i++)
+                    {
+                        lastHit.transform.GetChild(i).transform.position = lastHit.transform.GetChild(i).transform.position + rightHand.transform.forward * (rightStick.y / 100);
+                    }
+                }
+                else
+                {
+                    //rotates individually
+                    //lastHit.transform.Rotate(0, (rightStick.x), 0);
+                    for (int i = 0; i < lastHit.transform.childCount; i++)
+                    {
+                        lastHit.transform.GetChild(i).transform.Rotate(0, (rightStick.x), 0);
+                    }
+                }
+
+                prevHitPos = selectedChild.transform.position;
+                prevRHpos = rightHand.transform.position;
+
+
+                line.SetPosition(1, selectedChild.transform.position);
+
+
+            }
+
+            //first click
+            else
+            {
+                Debug.Log("SHOULDNT BE HERE");
+
+            }
+
+        }
+        //if no trigger is pressed
+        else
+        {
+
+
+            ReadyToTeleport = true;
+            SecIndOn = false;
+            line.enabled = false;
+
+
+            //turn physics on
+            //lastHit.GetComponent<Rigidbody>().useGravity = true;
+            //lastHit.GetComponent<Rigidbody>().isKinematic = false;
+            children = lastHit.GetComponentsInChildren<Rigidbody>();
+            foreach (Rigidbody comp in children)
+            {
+                comp.useGravity = true;
+                comp.isKinematic = false;
+            }
+
+            //lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
+            //lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+            children = lastHit.GetComponentsInChildren<Renderer>();
+            foreach (Renderer rend in children)
+            {
+                rend.material.shader = Shader.Find("Standard");
+            }
+
+            line.material.color = Color.white;
+
+            //lastHit.GetComponent<Collider>().isTrigger = false;
+            children = lastHit.GetComponentsInChildren<Collider>();
+            foreach (Collider comp in children)
+            {
+                comp.isTrigger = false;
+            }
+
+            /*
+            //return to initial position
+            if (collision)
+            {
+                if (copyPasteOn || newObjectOn)
+                {
+
+                    Destroy(lastHit);
+
+                }
+                else
+                {
+
+                    lastHit.transform.position = initialPosition;
+                    lastHit.transform.rotation = initialRotation;
+
+
+                }
+            }
+            */
+
+
+            lastHit = null;
+
+            groupSelected = false;
+
+        }            
+
+    }
+
+
+
     // Update is called once per frame
     void Update()
     {
+
+
+        if (groupSelected) {
+
+            GroupUpdate();
+            return;
+
+        }
+
+
 
         //create object
         if (newObjectOn && (lastHit == null))
@@ -80,6 +240,15 @@ public class RaycastHand : MonoBehaviour
 
 
             lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+
+
+            children = lastHit.GetComponentsInChildren<Renderer>();
+
+            foreach (Renderer rend in children)
+            {
+                rend.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+            }
+
             line.material.color = Color.green;
 
 
@@ -103,10 +272,6 @@ public class RaycastHand : MonoBehaviour
         }
 
 
-
-        //rotate camera
-        //Vector2 leftStick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
-        //cam.transform.Rotate(0,(leftStick.x / 100),0);
 
 
         //if left hand trigger is pressed
@@ -199,6 +364,14 @@ public class RaycastHand : MonoBehaviour
 
 
                         lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+
+                        children = lastHit.GetComponentsInChildren<Renderer>();
+
+                        foreach (Renderer rend in children)
+                        {
+                            rend.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+                        }
+
                         line.material.color = Color.green;
 
 
@@ -287,6 +460,13 @@ public class RaycastHand : MonoBehaviour
 
                     lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
 
+                    children = lastHit.GetComponentsInChildren<Renderer>();
+
+                    foreach (Renderer rend in children)
+                    {
+                        rend.material.shader = Shader.Find("Standard");
+                    }
+
                     line.material.color = Color.white;
 
                     lastHit = null;
@@ -302,6 +482,13 @@ public class RaycastHand : MonoBehaviour
 
                 //lastHit.GetComponent<MeshRenderer>().material = lastHit.GetComponent<Collision>().defaultMaterial; //reset material
                 lastHit.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+
+                children = lastHit.GetComponentsInChildren<Renderer>();
+
+                foreach (Renderer rend in children)
+                {
+                    rend.material.shader = Shader.Find("Standard");
+                }
 
                 line.material.color = Color.white;
 
@@ -469,6 +656,17 @@ public class RaycastHand : MonoBehaviour
                     groupOn = false;
                     curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOff;
 
+                    //newGroup.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+
+                    children = newGroup.GetComponentsInChildren<Renderer>();
+
+                    foreach (Renderer rend in children)
+                    {
+                        rend.material.shader = Shader.Find("Standard");
+                    }
+
+                    return;
+
                 }
                 else
                 {
@@ -476,6 +674,13 @@ public class RaycastHand : MonoBehaviour
                     groupOn = true;
 
                     curr.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = buttonOn;
+
+
+                    //make a new group
+                    newGroup = Instantiate(Group, Group.transform.parent, true);
+                    
+
+
                 }
 
             }
@@ -489,9 +694,93 @@ public class RaycastHand : MonoBehaviour
                 lastHit = null;
 
             }
+
+
+            else if (groupOn)
+            {
+                
+
+                //highlight it
+                curr.GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+
+                children = curr.GetComponentsInChildren<Renderer>();
+
+                foreach (Renderer rend in children)
+                {
+                   rend.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+                }
+
+                curr.transform.SetParent(newGroup.transform);
+
+                lastHit = null;
+
+                return;
+
+            }
+
             //hit object elligible for transform
             else
             {
+
+
+                //if its a part of a group
+                if (curr.transform.parent.gameObject.CompareTag("Group"))
+                {
+
+                    groupSelected = true;
+
+                    selectedChild = curr;
+
+                    //save previous locations
+                    prevRHpos = rightHand.transform.position;
+                    prevHitPos = curr.transform.position;
+                    initialPosition = curr.transform.position;
+                    initialRotation = curr.transform.rotation;
+
+
+                    curr = curr.transform.parent.gameObject;
+
+                    //highlight them all
+                    children = curr.GetComponentsInChildren<Renderer>();
+
+                    foreach (Renderer rend in children)
+                    {
+                        rend.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+                    }
+
+
+                    
+
+
+                    //curr.GetComponent<Collider>().isTrigger = true;
+                    children = curr.GetComponentsInChildren<Collider>();
+                    foreach (Collider comp in children)
+                        comp.isTrigger = true;
+
+
+                    line.material.color = Color.green;
+
+
+
+                    //turn physics off
+                    //curr.GetComponent<Rigidbody>().useGravity = false;
+                    //curr.GetComponent<Rigidbody>().isKinematic = true;
+                    children = curr.GetComponentsInChildren<Rigidbody>();
+                    foreach (Rigidbody comp in children) { 
+                        comp.useGravity = false;
+                        comp.isKinematic = true;
+                    }
+
+
+                    lastHit = curr;
+
+
+
+                    return;
+
+
+
+                }
 
 
 
@@ -524,7 +813,17 @@ public class RaycastHand : MonoBehaviour
                 }
 
                 //curr.GetComponent<MeshRenderer>().material = curr.GetComponent<Collision>().activeMaterial; //reset material
+                
                 curr.GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+
+                children = curr.GetComponentsInChildren<Renderer>();
+
+                foreach (Renderer rend in children)
+                {
+                    rend.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+                }
+
+
                 line.material.color = Color.green;
 
 
