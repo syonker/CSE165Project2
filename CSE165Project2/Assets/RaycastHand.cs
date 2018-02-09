@@ -461,7 +461,17 @@ public class RaycastHand : MonoBehaviour
                     }
                     else
                     {
-                        lastHit.transform.Rotate(0, 0, (rightStick.x));
+
+                        if (!lastHit.CompareTag("TapePoint")) {
+
+                            lastHit.transform.Rotate(0, 0, (rightStick.x));
+
+                        }
+                        else
+                        {
+                            lastHit.transform.Rotate(0, rightStick.x, 0);
+
+                        }
                     }
 
 
