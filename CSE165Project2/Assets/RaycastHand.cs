@@ -8,6 +8,8 @@ public class RaycastHand : MonoBehaviour
     public GameObject rightHand;
     public GameObject leftHand;
 
+    private Vector3[] initialPositions;
+
     public GameObject Group;
     private GameObject newGroup;
 
@@ -17,7 +19,7 @@ public class RaycastHand : MonoBehaviour
 
     private bool aPressed = false;
 
-    private bool groupSelected;
+    public bool groupSelected;
 
     private int indexNew = 0;
 
@@ -69,6 +71,8 @@ public class RaycastHand : MonoBehaviour
         line = GetComponent<LineRenderer>();
         line.material.color = Color.white;
         line.enabled = false;
+
+        initialPositions = new Vector3[100];
     }
 
 
@@ -180,26 +184,18 @@ public class RaycastHand : MonoBehaviour
                 comp.isTrigger = false;
             }
 
-            /*
+            
             //return to initial position
             if (collision)
             {
-                if (copyPasteOn || newObjectOn)
+
+                for (int i = 0; i < lastHit.transform.childCount; i++)
                 {
-
-                    Destroy(lastHit);
-
+                    lastHit.transform.GetChild(i).transform.position = initialPositions[i];
                 }
-                else
-                {
-
-                    lastHit.transform.position = initialPosition;
-                    lastHit.transform.rotation = initialRotation;
-
-
-                }
+                
             }
-            */
+            
 
 
             lastHit = null;
@@ -734,6 +730,15 @@ public class RaycastHand : MonoBehaviour
                     //save previous locations
                     prevRHpos = rightHand.transform.position;
                     prevHitPos = curr.transform.position;
+
+
+                    for (int i = 0; i < curr.transform.parent.childCount; i++)
+                    {
+
+                        initialPositions[i] = curr.transform.parent.GetChild(i).transform.position;
+
+                    }
+
                     initialPosition = curr.transform.position;
                     initialRotation = curr.transform.rotation;
 

@@ -35,15 +35,45 @@ public class Collision : MonoBehaviour
 
     void OnTriggerStay(Collider trigger)
     {
-        if (empty.GetComponent<RaycastHand>().lastHit == this.gameObject)
+
+        //Debug.Log("OnTriggerStay OUTSIDE Group" + this.name);
+
+
+        if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().lastHit == this.gameObject))
         {
+            Debug.Log("OnTriggerStay No Group" + this.name);
+
+            //other.gameObject.transform.position = empty.GetComponent<RaycastHand>().lastValidPosition;
 
             empty.GetComponent<RaycastHand>().collision = true;
 
-            //change material to red
-            //this.GetComponent<MeshRenderer>().material = collisionMaterial;
-            //GetComponent<Renderer>().material.shader = Shader.Find("Collision");
+            //change to green
+            //this.GetComponent<MeshRenderer>().material = activeMaterial;
+            //GetComponent<Renderer>().material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
             line.material.color = Color.red;
+
+
+        }
+        else if (empty.GetComponent<RaycastHand>().groupSelected)
+        {
+
+            Debug.Log("OnTriggerStay Group" + this.name);
+
+            GameObject parent = empty.GetComponent<RaycastHand>().lastHit;
+
+            for (int i = 0; i < parent.transform.childCount; i++)
+            {
+
+                if (parent.transform.GetChild(i).gameObject == this.gameObject)
+                {
+                    empty.GetComponent<RaycastHand>().collision = true;
+                    line.material.color = Color.red;
+                    return;
+
+                }
+
+            }
+
 
         }
     }
@@ -51,9 +81,13 @@ public class Collision : MonoBehaviour
     //not colliding 
     private void OnTriggerExit(Collider other)
     {
-        if (empty.GetComponent<RaycastHand>().lastHit == this.gameObject)
+
+        //Debug.Log("OnTriggerEXIT OUTSIDE Group" + this.name);
+
+
+        if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().lastHit == this.gameObject))
         {
-            //Debug.Log("OnTriggerExit" + this.name);
+            Debug.Log("OnTriggerExit No Group" + this.name);
 
             //other.gameObject.transform.position = empty.GetComponent<RaycastHand>().lastValidPosition;
 
@@ -65,7 +99,25 @@ public class Collision : MonoBehaviour
             line.material.color = Color.green;
 
 
+        }
+        else if (empty.GetComponent<RaycastHand>().groupSelected)
+        {
+            Debug.Log("OnTriggerExit Group" + this.name);
 
+            GameObject parent = empty.GetComponent<RaycastHand>().lastHit;
+
+            for (int i = 0; i < parent.transform.childCount; i++)
+            {
+
+                if (parent.transform.GetChild(i).gameObject == this.gameObject)
+                {
+                    empty.GetComponent<RaycastHand>().collision = false;
+                    line.material.color = Color.green;
+                    return;
+
+                }
+
+            }
 
 
         }
