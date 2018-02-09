@@ -72,6 +72,10 @@ public class RaycastHand : MonoBehaviour
     public Vector3 initialPosition;
     public Vector3 initialPosition2;
 
+    public Quaternion initialRotation2;
+    public Quaternion[] initialRotations2;
+    public Quaternion[] initialRotations;
+
 
 
 
@@ -92,6 +96,8 @@ public class RaycastHand : MonoBehaviour
         line.enabled = false;
 
         initialPositions = new Vector3[100];
+        initialRotations = new Quaternion[100];
+
     }
 
 
@@ -234,6 +240,7 @@ public class RaycastHand : MonoBehaviour
                     for (int i = 0; i < lastHit.transform.childCount; i++)
                     {
                         lastHit.transform.GetChild(i).transform.position = initialPositions[i];
+                        lastHit.transform.GetChild(i).transform.rotation = initialRotations[i];
                     }
                 }
                 
@@ -249,6 +256,7 @@ public class RaycastHand : MonoBehaviour
                 falling = true;
 
                 initialPositions2 = initialPositions;
+                initialRotations2 = initialRotations;
 
 
             }
@@ -608,6 +616,7 @@ public class RaycastHand : MonoBehaviour
                     lastHit.GetComponent<Collider>().isTrigger = true;
                     falling = true;
                     initialPosition2 = initialPosition;
+                    initialRotation2 = initialRotation;
 
                 }
 
@@ -866,6 +875,8 @@ public class RaycastHand : MonoBehaviour
                         {
 
                             initialPositions[i] = curr.transform.parent.GetChild(i).transform.position;
+                            initialRotations[i] = curr.transform.parent.GetChild(i).transform.rotation;
+
                         } else
                         {
 

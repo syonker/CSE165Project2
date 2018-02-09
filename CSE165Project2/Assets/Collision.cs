@@ -77,6 +77,7 @@ public class Collision : MonoBehaviour
                         {
 
                             transform.parent.GetChild(i).transform.position = empty.GetComponent<RaycastHand>().initialPositions2[i];
+                            transform.parent.GetChild(i).transform.rotation = empty.GetComponent<RaycastHand>().initialRotations2[i];
 
                         }
 
@@ -123,6 +124,7 @@ public class Collision : MonoBehaviour
                     //else { 
 
                         this.transform.position = empty.GetComponent<RaycastHand>().initialPosition2;
+                        this.transform.rotation = empty.GetComponent<RaycastHand>().initialRotation2;
 
                     //}
 
