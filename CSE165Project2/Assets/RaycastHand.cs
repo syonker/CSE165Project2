@@ -21,6 +21,10 @@ public class RaycastHand : MonoBehaviour
 
     public bool groupSelected;
 
+    public GameObject grabbed;
+
+    public bool collisionGrab = false;
+
     private int indexNew = 0;
 
     public GameObject ground;

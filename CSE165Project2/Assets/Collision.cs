@@ -12,36 +12,22 @@ public class Collision : MonoBehaviour
 
     public LineRenderer line;
 
-    //colliding 
-    private void OnTriggerEnter(Collider other)
-    {
 
-        if (empty.GetComponent<RaycastHand>().lastHit == this.gameObject)
-        {
-
-            //Debug.Log("OnTriggerEnter" + this.name);
-
-            //other.gameObject.transform.position = empty.GetComponent<RaycastHand>().lastValidPosition;
-
-            //empty.GetComponent<RaycastHand>().collision = true;
-
-            //change material to red
-            //this.GetComponent<MeshRenderer>().material = collisionMaterial;
-
-
-        }
-
-    }
 
     void OnTriggerStay(Collider trigger)
     {
 
         //Debug.Log("OnTriggerStay OUTSIDE Group" + this.name);
-
-
-        if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().lastHit == this.gameObject))
+        if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().grabbed == this.gameObject))
         {
-            Debug.Log("OnTriggerStay No Group" + this.name);
+
+            //Debug.Log("Grabbable in collision");
+            empty.GetComponent<RaycastHand>().collisionGrab = true;
+
+        }
+         else if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().lastHit == this.gameObject))
+        {
+            //Debug.Log("OnTriggerStay No Group" + this.name);
 
             //other.gameObject.transform.position = empty.GetComponent<RaycastHand>().lastValidPosition;
 
@@ -57,7 +43,7 @@ public class Collision : MonoBehaviour
         else if (empty.GetComponent<RaycastHand>().groupSelected)
         {
 
-            Debug.Log("OnTriggerStay Group" + this.name);
+            //Debug.Log("OnTriggerStay Group" + this.name);
 
             GameObject parent = empty.GetComponent<RaycastHand>().lastHit;
 
@@ -85,9 +71,16 @@ public class Collision : MonoBehaviour
         //Debug.Log("OnTriggerEXIT OUTSIDE Group" + this.name);
 
 
-        if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().lastHit == this.gameObject))
+        if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().grabbed == this.gameObject))
         {
-            Debug.Log("OnTriggerExit No Group" + this.name);
+
+            //Debug.Log("Grabbable exit collision");
+            empty.GetComponent<RaycastHand>().collisionGrab = false;
+
+        }
+        else if (!empty.GetComponent<RaycastHand>().groupSelected && (empty.GetComponent<RaycastHand>().lastHit == this.gameObject))
+        {
+            //Debug.Log("OnTriggerExit No Group" + this.name);
 
             //other.gameObject.transform.position = empty.GetComponent<RaycastHand>().lastValidPosition;
 
@@ -102,7 +95,7 @@ public class Collision : MonoBehaviour
         }
         else if (empty.GetComponent<RaycastHand>().groupSelected)
         {
-            Debug.Log("OnTriggerExit Group" + this.name);
+            //Debug.Log("OnTriggerExit Group" + this.name);
 
             GameObject parent = empty.GetComponent<RaycastHand>().lastHit;
 
