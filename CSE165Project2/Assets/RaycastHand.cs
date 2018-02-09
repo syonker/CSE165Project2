@@ -8,7 +8,15 @@ public class RaycastHand : MonoBehaviour
     public GameObject rightHand;
     public GameObject leftHand;
 
+    public GameObject Furniture;
+
     private Vector3[] initialPositions;
+
+
+
+    public bool falling = false;
+
+
 
     public GameObject Group;
     private GameObject newGroup;
@@ -254,7 +262,7 @@ public class RaycastHand : MonoBehaviour
         if (newObjectOn && (lastHit == null))
         {
 
-            GameObject newObj = Instantiate(NewArray.transform.GetChild(indexNew).gameObject, transform.parent, true);
+            GameObject newObj = Instantiate(NewArray.transform.GetChild(indexNew).gameObject, Furniture.transform, true);
 
             lastHit = newObj;
 
@@ -472,7 +480,7 @@ public class RaycastHand : MonoBehaviour
 
 
 
-
+            //just released
             if (lastHit != null)
             {
 
@@ -517,13 +525,19 @@ public class RaycastHand : MonoBehaviour
                 line.material.color = Color.white;
 
 
-
+                
                 lastHit.GetComponent<Collider>().isTrigger = false;
+                
+
 
                 //reset rotation
-                //lastHit.transform.rotation.
+                //float zRot = lastHit.transform.rotation.eulerAngles.z;
 
-                //lastHit.GetComponent<Rigidbody>().isKinematic = false;
+
+                //lastHit.transform.rotation = Quaternion.Euler(-90, 0, zRot);
+
+
+
 
 
                 //return to initial position
@@ -543,6 +557,13 @@ public class RaycastHand : MonoBehaviour
 
 
                     }
+                } else
+                {
+
+
+                    lastHit.GetComponent<Collider>().isTrigger = true;
+                    falling = true;
+
                 }
 
 
